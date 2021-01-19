@@ -3,7 +3,8 @@ module Lib
   ) 
 where
 
--- Doesn't work with newtype
+-- Doesn't work with newtype as forcing to WHNF penetrates the 
+-- wrapper, so too strict
 data Box a = Box a
 
 unBox :: Box a -> a
