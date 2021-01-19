@@ -15,13 +15,14 @@ instance Functor Box where
 instance Applicative Box where
   pure = Box
   
-  -- Doesn't work without the case
-  fBox <*> xBox = Box (case xBox of { Box x -> unBox fBox x })
+  -- @xBox@ has the form @(\x -> x `seq` Box x) a :: Box a@ 
+  -- so eval to WHNF to trigger @seq@
+  --
+  -- fBox <*> xBox = Box (case xBox of { Box x -> unBox fBox x })
+  fBox <*> xBox = Box (xBox `seq` unBox fBox (unBox xBox))
 
 forceElems :: Traversable t => t a -> t a
-forceElems  
-  = unBox 
-  . traverse (\x -> x `seq` Box x)
+forceElems  = unBox . traverse (\x -> x `seq` Box x)
    
 -- newtype Codensity a = Codensity { runCodensity :: forall r . (a -> r) -> r }
 --
